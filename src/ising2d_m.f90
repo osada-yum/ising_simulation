@@ -1,4 +1,5 @@
 module ising2d_m
+  use, intrinsic :: iso_fortran_env
   implicit none
   private
   integer(int32), parameter :: lb_exparr = -8, ub_exparr = 8
@@ -50,7 +51,7 @@ contains
   !> set_ising_allup_ising2d: Set spins `1`.
   pure subroutine set_ising_allup_ising2d(this)
     class(ising2d), intent(inout) :: this
-    this%spins(:) = 1
+    this%spins_(:) = 1_int32
   end subroutine set_ising_allup_ising2d
   !> set_ising_random_ising2d: Set spins `1` or `-1` randomly.
   impure subroutine set_ising_random_ising2d(this)
@@ -78,7 +79,7 @@ contains
     do delta_e = 1, ub_exparr
        this%exparr_(delta_e) = exp(- beta * delta_e)
     end do
-  end subroutine set_kbt_ising2d
+  end subroutine set_beta_ising2d
 
   !> update_ising2d: Update the system by Metropolis method.
   impure subroutine update_ising2d(this)
@@ -126,6 +127,7 @@ contains
   end function calc_total_energy_ising2d
   !> calc_total_magne_ising2d: Calculate the total magne.
   pure integer(int64) function calc_total_magne_ising2d(this) result(res)
+    class(ising2d), intent(in) :: this
     integer(int64) :: i
     res = 0_int64
     do i = 1_int64, this%nall_
