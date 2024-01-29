@@ -56,11 +56,10 @@ contains
   !> set_ising_random_ising2d: Set spins `1` or `-1` randomly.
   impure subroutine set_ising_random_ising2d(this)
     class(ising2d), intent(inout) :: this
-    integer(int64) :: i
     real(real64), allocatable :: r(:)
     allocate(r(1:this%nall_))
     call random_number(r)
-    this%spins_(1:this%nall_) = merge(1_int64, -1_int64, r < 0.5_real64)
+    this%spins_(1:this%nall_) = merge(1_int32, -1_int32, r < 0.5_real64)
     call this%update_norishiro()
   end subroutine set_ising_random_ising2d
   !> set_kbt_ising2d: Set parameter `beta` as `1 / kbt`.
