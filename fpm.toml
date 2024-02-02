@@ -9,9 +9,9 @@ auto-executables = true
 auto-tests = true
 auto-examples = true
 module-naming = false
-external-modules = ["mpi_f08"]
+external-modules = ["mpi"]
 [install]
-library = true
+library = false
 [fortran]
 implicit-typing = false
 implicit-external = false
@@ -23,3 +23,7 @@ numeric_simulation = { git = "https://github.com/osada-yum/Numerical_utilities.g
 name = "ising2d_relaxation"
 source-dir = "app"
 main = "ising2d_relaxation.f90"
+[[executable]]
+name = "mpi_ising2d_relaxation"
+source-dir = "app"
+main = "mpi_ising2d_relaxation.f90"
