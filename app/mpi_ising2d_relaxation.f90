@@ -23,6 +23,13 @@ program mpi_ising2d_simulation
      write(output_unit, '(a, g0)' ) "# 温度: ", system%kbt()
      write(output_unit, '(a)' ) "# method: Metropolis"
      write(output_unit, '(a, i0)' ) "# the number of processors: ", num_proc
+
+     write(error_unit, '(a,i0)'    ) "# Nsize: ", system%nall()
+     write(error_unit, '(2(a, i0))') "# nx: ", system%nx(), " ny: ", system%ny()
+     write(error_unit, '(2(a, i0))') "# MCS: ", mcs, " Nsample: ", nsample
+     write(error_unit, '(a, g0)' ) "# 温度: ", system%kbt()
+     write(error_unit, '(a)' ) "# method: Metropolis"
+     write(error_unit, '(a, i0)' ) "# the number of processors: ", num_proc
   end if
   do j = 1, nsample
      if (myrank == 0) &
