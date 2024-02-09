@@ -54,8 +54,8 @@ program mpi_ising2d_simulation
           write(output_unit, '(*(g0, 1x))') system%nall(), all_order_params(i)%num_sample(), i, &
                & all_order_params(i)%mean1(), all_order_params(i)%mean2(), &
                & all_order_params(i)%square_mean1(), all_order_params(i)%square_mean2(), &
-               & all_order_params(i)%var1(), all_order_params(i)%var2(), &
-               & all_order_params(i)%cov()
+               & system%nall() * all_order_params(i)%var1(), system%nall() * all_order_params(i)%var2(), &
+               & system%nall() * all_order_params(i)%cov()
        end do
     end if
   end block
