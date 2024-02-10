@@ -48,9 +48,7 @@ program mpi_ising2d_simulation
   end do
   block
     type(variance_covariance_kahan) :: all_order_params(mcs)
-    do i = 1, mcs
-       call vck_mpi_gather(order_parameter(i), all_order_params(i), 0, myrank, num_proc, ierr)
-    end do
+    call vck_mpi_multi_gather(mcs, order_parameter, all_order_params, 0, myrank, num_proc, ierr)
     if (myrank == 0) then
        write(output_unit, '(a)') "# Nsize, Nsample, mcs, <m>, <e>, <m^2>, <e^2>, χ, C, m'"
        do i = 1, mcs
