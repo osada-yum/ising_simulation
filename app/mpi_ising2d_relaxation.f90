@@ -5,9 +5,12 @@ program mpi_ising2d_simulation
   use variance_covariance_kahan_m
   use mpi_variance_covariance_kahan_m
   implicit none
-  integer(int32), parameter :: mcs = 1000, nsample = 25
-  integer(int64), parameter :: nx = 1001, ny = 1000
-  real(real64), parameter :: kbt = 2.26918531421302_real64, n_inv_r64 = 1 / real(nx * ny, real64)
+  integer(int32), parameter :: mcs = 1000
+  integer(int32), parameter :: nsample = 25
+  integer(int64), parameter :: nx = 1001
+  integer(int64), parameter :: ny = 1000
+  real(real64), parameter :: kbt = 2.26918531421302_real64
+  real(real64), parameter :: n_inv_r64 = 1 / real(nx * ny, real64)
   type(ising2d) :: system
   type(variance_covariance_kahan) :: order_parameter(mcs)
   integer(int32) :: i, j
