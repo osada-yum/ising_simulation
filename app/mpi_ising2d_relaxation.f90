@@ -1,6 +1,6 @@
 program mpi_ising2d_simulation
   use, intrinsic :: iso_fortran_env
-  use mpi_f08
+  use mpi
   use ising2d_m
   use variance_covariance_kahan_m
   use mpi_variance_covariance_kahan_m
