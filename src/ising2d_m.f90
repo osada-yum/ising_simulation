@@ -40,6 +40,9 @@ contains
     class(ising2d), intent(inout) :: this
     integer(int64), intent(in) :: nx, ny
     real(real64), intent(in) :: kbt
+    if (is_even(nx) .or. (.not. is_even(ny))) then
+       error stop "The parity of size must be (x, y) == (odd, even)."
+    end if
     this%nx_ = nx
     this%ny_ = ny
     this%nall_ = nx * ny
@@ -47,6 +50,11 @@ contains
     call this%set_ising_allup()
     allocate(this%exparr_(lb_exparr:ub_exparr))
     call this%set_kbt(kbt)
+  contains
+    pure logical function is_even(v) result(res)
+      integer(int64), intent(in) :: v
+      res = iand(v, b'1') == 0_int64
+    end function is_even
   end subroutine init_ising2d
   !> set_ising_allup_ising2d: Set spins `1`.
   pure subroutine set_ising_allup_ising2d(this)
