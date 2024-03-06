@@ -12,7 +12,7 @@ program mpi_ising2d_simulation
   real(real64), parameter :: kbt = 2.26918531421302_real64
   real(real64), parameter :: n_inv_r64 = 1 / real(nx * ny, real64)
   type(ising2d) :: system
-  type(variance_covariance_kahan) :: order_parameter(mcs)
+  type(variance_covariance_kahan), allocatable :: order_parameter(:)
   integer(int32) :: i, j
   integer(int32) :: myrank, num_proc, ierr
   call MPI_Init(ierr)
@@ -34,6 +34,7 @@ program mpi_ising2d_simulation
      write(error_unit, '(a)' ) "# method: Metropolis"
      write(error_unit, '(a, i0)' ) "# the number of processors: ", num_proc
   end if
+  allocate(order_parameter(mcs), source = variance_covariance_kahan())
   do j = 1, nsample
      if (myrank == 0) &
           write(error_unit, '(a, i0)') "sample: ", j
@@ -47,7 +48,8 @@ program mpi_ising2d_simulation
      end do
   end do
   block
-    type(variance_covariance_kahan) :: all_order_params(mcs)
+    type(variance_covariance_kahan), allocatable :: all_order_params(:)
+    allocate(all_order_params(mcs), source = variance_covariance_kahan())
     call vck_mpi_multi_gather(mcs, order_parameter, all_order_params, 0, myrank, num_proc, ierr)
     if (myrank == 0) then
        write(output_unit, '(a)') "# Nsize, Nsample, mcs, <m>, <e>, <m^2>, <e^2>, χ, C, m'"
