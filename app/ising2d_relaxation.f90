@@ -7,7 +7,7 @@ program ising2d_simulation
   integer(int64), parameter :: nx = 1001, ny = 1000
   real(real64), parameter :: kbt = 2.26918531421302_real64, n_inv_r64 = 1 / real(nx * ny, real64)
   type(ising2d) :: system
-  type(variance_covariance_kahan) :: order_parameter(mcs)
+  type(variance_covariance_kahan), allocatable :: order_parameter(:)
   integer(int32) :: i, j
   call system%init(nx, ny, kbt)
   write(output_unit, '(a,i0)'    ) "# Nsize: ", system%nall()
@@ -15,6 +15,7 @@ program ising2d_simulation
   write(output_unit, '(2(a, i0))') "# MCS: ", mcs, " Nsample: ", nsample
   write(output_unit , '(a, g0)' ) "# 温度: ", system%kbt()
   write(output_unit , '(a)' ) "# method: METROPOLIS"
+  allocate(order_parameter(mcs), source = variance_covariance_kahan())
   do j = 1, nsample
      write(error_unit, '(a, i0)') "sample: ", j
      call system%set_ising_allup()
