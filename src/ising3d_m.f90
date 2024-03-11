@@ -2,14 +2,15 @@ module ising3d_m
   use, intrinsic :: iso_fortran_env
   implicit none
   private
-  integer(int32), parameter :: lb_exparr = -12, ub_exparr = 12
+  integer(int32), parameter :: spin_map(0:1) = [-1, 1]
   public :: ising3d
   type :: ising3d
      private
      integer(int64) :: nx_, ny_, nz_, nxy_, nall_
      real(real64) :: beta_
      integer(int32), allocatable :: spins_(:)
-     real(real64), allocatable :: exparr_(:)
+     integer(int64), allocatable :: energy_table_(:, :)
+     real(real64), allocatable :: ws_(:, :)
    contains
      !> initializer.
      procedure, pass :: init => init_ising3d
@@ -69,7 +70,7 @@ contains
     real(real64), allocatable :: r(:)
     allocate(r(1:this%nall_))
     call random_number(r)
-    this%spins_(1:this%nall_) = merge(1_int32, -1_int32, r < 0.5_real64)
+    this%spins_(1:this%nall_) = merge(1_int32, 0_int32, r < 0.5_real64)
     call this%update_norishiro()
   end subroutine set_ising_random_ising3d
   !> set_kbt_ising3d: Set parameter `beta` as `1 / kbt`.
@@ -82,12 +83,42 @@ contains
   pure subroutine set_beta_ising3d(this, beta)
     class(ising3d), intent(inout) :: this
     real(real64), intent(in) :: beta
-    integer(int32) :: delta_e
+    integer(int32) :: i1, i2, i3, i4, i5, i6
     this%beta_ = beta
-    if (.not. allocated(this%exparr_)) &
-         & allocate(this%exparr_(lb_exparr:ub_exparr), source = 1.0_real64)
-    do delta_e = 1, ub_exparr
-       this%exparr_(delta_e) = exp(- beta * delta_e)
+    if (.not. allocated(this%energy_table_)) &
+         & allocate(this%energy_table_(0:3, 0:1))
+    if (.not. allocated(this%ws_)) &
+         & allocate(this%ws_(0:6, 0:1))
+    do i1 = 0, 1
+       do i2 = 0, 1
+          do i3 = 0, 1
+             associate(s => i1 + i2 + i3)
+               this%energy_table_(s, 0) = - spin_map(0) * sum(spin_map([i1, i2, i3]))
+               this%energy_table_(s, 1) = - spin_map(1) * sum(spin_map([i1, i2, i3]))
+           end associate
+          end do
+       end do
+    end do
+    do i1 = 0, 1
+       do i2 = 0, 1
+          do i3 = 0, 1
+             associate(s1 => i1 + i2 + i3)
+               do i4 = 0, 1
+                  do i5 = 0, 1
+                     do i6 = 0, 1
+                        associate(s2 => i4 + i5 + i6)
+                          associate(e1 => this%energy_table_(s1, 0) + this%energy_table_(s2, 0), &
+                               & e2 => this%energy_table_(s1, 1) + this%energy_table_(s2, 1))
+                            this%ws_(s1 + s2, 0) = min(1.0_real64, exp(- this%beta_ * (e2 - e1)))
+                            this%ws_(s1 + s2, 1) = min(1.0_real64, exp(- this%beta_ * (e1 - e2)))
+                          end associate
+                        end associate
+                     end do
+                  end do
+               end do
+             end associate
+          end do
+       end do
     end do
   end subroutine set_beta_ising3d
 
@@ -110,13 +141,12 @@ contains
     class(ising3d), intent(inout) :: this
     integer(int64), intent(in) :: idx
     real(real64), intent(in) :: r
-    integer(int32) :: delta_e
-    delta_e = 2 * this%spins_(idx) * (&
-         & this%spins_(idx + 1) + this%spins_(idx - 1) + &
+    associate(s => this%spins_(idx + 1) + this%spins_(idx - 1) + &
          & this%spins_(idx + this%nx_) + this%spins_(idx - this%nx_) + &
          & this%spins_(idx + this%nxy_) + this%spins_(idx - this%nxy_))
-    if (r < this%exparr_(delta_e)) &
-         this%spins_(idx) = - this%spins_(idx)
+      if (r < this%ws_(s, this%spins_(idx))) &
+           & this%spins_(idx) = 1 - this%spins_(idx)
+    end associate
   end subroutine update_onesite_ising3d
   !> update_norishiro_ising3d: Update norishiro.
   pure subroutine update_norishiro_ising3d(this)
@@ -134,7 +164,9 @@ contains
     integer(int64) :: i
     res = 0_int64
     do i = 1_int64, this%nall_
-       res = res - this%spins_(i) * (this%spins_(i + 1) + this%spins_(i + this%nx_) + this%spins_(i + this%nxy_))
+       associate(s => this%spins_(i + 1) + this%spins_(i + this%nx_) + this%spins_(i + this%nxy_))
+         res = res + this%energy_table_(s, this%spins_(i))
+       end associate
     end do
   end function calc_total_energy_ising3d
   !> calc_total_magne_ising3d: Calculate the total magne.
@@ -143,7 +175,7 @@ contains
     integer(int64) :: i
     res = 0_int64
     do i = 1_int64, this%nall_
-       res = res + this%spins_(i)
+       res = res + spin_map(this%spins_(i))
     end do
   end function calc_total_magne_ising3d
 
