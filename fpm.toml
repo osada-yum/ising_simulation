@@ -27,3 +27,7 @@ main = "ising2d_relaxation.f90"
 name = "mpi_ising2d_relaxation"
 source-dir = "app"
 main = "mpi_ising2d_relaxation.f90"
+[[executable]]
+name = "mpi_ising3d_relaxation"
+source-dir = "app"
+main = "mpi_ising3d_relaxation.f90"
