@@ -1,5 +1,6 @@
 module ising3d_m
   use, intrinsic :: iso_fortran_env
+  use union_find_m
   implicit none
   private
   integer(int32), parameter :: spin_map(0:1) = [-1, 1]
@@ -21,6 +22,8 @@ module ising3d_m
      procedure, pass :: set_beta => set_beta_ising3d
      !> updater.
      procedure, pass :: update => update_ising3d
+     procedure, pass :: update_swendsen_wang => update_swendsen_wang_ising3d
+     procedure, pass :: flip_all => flip_all_ising3d
      procedure, pass, private :: update_onesite => update_onesite_ising3d
      procedure, pass, private :: update_norishiro => update_norishiro_ising3d
      !> calculator.
@@ -136,6 +139,51 @@ contains
        call this%update_norishiro()
     end do
   end subroutine update_ising3d
+  !> update_swendsen_wang_ising3d: Update the system by Metropolis method.
+  impure subroutine update_swendsen_wang_ising3d(this)
+    class(ising3d), intent(inout) :: this
+    real(real64), allocatable :: r(:, :)
+    type(union_find) :: uf
+    logical, allocatable :: is_flip(:)
+    integer(int64) :: i
+    allocate(r(4, this%nall_))
+    allocate(is_flip(this%nall_), source = .false.)
+    call random_number(r)
+    call uf%init(this%nall_)
+    do i = 1, this%nall_
+       block
+         integer(int64) :: right, up, top
+         right = i + 1; up = i + this%nx_; top = i + this%nxy_
+         if (right > this%nall_) right = 1
+         if (up > this%nall_) up = up - this%nall_
+         if (top > this%nall_) top = top - this%nall_
+         call maybe_connect(uf, i, right, r(1, i))
+         call maybe_connect(uf, i, up, r(2, i))
+         call maybe_connect(uf, i, top, r(3, i))
+         if (r(4, i) < 0.5_real64) &
+              & is_flip(i) = .true.
+       end block
+    end do
+    do i = 1, this%nall_
+       if (is_flip(uf%root(i))) &
+            & this%spins_(i) = 1 - this%spins_(i)
+    end do
+    call this%update_norishiro()
+  contains
+    impure subroutine maybe_connect(uf, i1, i2, r)
+      type(union_find), intent(inout) :: uf
+      integer(int64), intent(in) :: i1, i2
+      real(real64), intent(in) :: r
+      if (this%spins_(i1) /= this%spins_(i2)) return
+      if (uf%same(i1, i2)) return
+      if (r >= 1 - exp(-2 * this%beta_)) return
+      call uf%union(i1, i2)
+    end subroutine maybe_connect
+  end subroutine update_swendsen_wang_ising3d
+  pure subroutine flip_all_ising3d(this)
+    class(ising3d), intent(inout) :: this
+    this%spins_(:) = 1 - this%spins_(:)
+  end subroutine flip_all_ising3d
   !> update_onesite_ising3d: Update a spin of the system.
   pure subroutine update_onesite_ising3d(this, idx, r)
     class(ising3d), intent(inout) :: this
