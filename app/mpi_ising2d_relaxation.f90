@@ -52,10 +52,10 @@ program mpi_ising2d_simulation
     allocate(all_order_params(mcs), source = variance_covariance_kahan())
     call vck_mpi_multi_gather(mcs, order_parameter, all_order_params, 0, myrank, num_proc, ierr)
     if (myrank == 0) then
-       write(output_unit, '(a)') "# Nsize, Nsample, mcs, <m>, <e>, <m^2>, <e^2>, χ, C, m'"
+       write(output_unit, '(a)') "# Nsize, Nsample, mcs, <m>, <e>, <me>, <m^2>, <e^2>, χ, C, m'"
        do i = 1, mcs
           write(output_unit, '(*(g0, 1x))') system%nall(), all_order_params(i)%num_sample(), i, &
-               & all_order_params(i)%mean1(), all_order_params(i)%mean2(), &
+               & all_order_params(i)%mean1(), all_order_params(i)%mean2(), all_order_params(i)%mean_v1v2(), &
                & all_order_params(i)%square_mean1(), all_order_params(i)%square_mean2(), &
                & system%nall() * all_order_params(i)%var1(), system%nall() * all_order_params(i)%var2(), &
                & system%nall() * all_order_params(i)%cov()
