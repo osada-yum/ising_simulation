@@ -1,7 +1,8 @@
 set -x -u -e
 
-FCFLAGS="-O3"
+FCFLAGS="-O3 -Wall -Wextra"
 # FCFLAGS="${FCFLAGS} -g -fbacktrace -Wall -Wextra"
+
 nx=1000
 ny=${nx}
 mcs=1000

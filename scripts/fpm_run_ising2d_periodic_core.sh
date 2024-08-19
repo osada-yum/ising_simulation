@@ -12,9 +12,39 @@ root_dir="./bin/root_$$"
 # execname="mpi_ising2d_periodic_table_relaxation"
 # execfile="${root_dir}/bin/${execname}"
 
-srcfile="./src/ising2d_periodic_probtable_m.f90"
-progfile="./app/mpi_ising2d_periodic_probtable_relaxation.f90"
-execname="mpi_ising2d_periodic_probtable_relaxation"
+# srcfile="./src/ising2d_periodic_probtable_m.f90"
+# progfile="./app/mpi_ising2d_periodic_probtable_relaxation.f90"
+# execname="mpi_ising2d_periodic_probtable_relaxation"
+# execfile="${root_dir}/bin/${execname}"
+
+# srcfile="./src/ising2d_periodic_dual_lattice_probtable_m.f90"
+# progfile="./app/mpi_ising2d_periodic_dual_lattice_probtable_relaxation.f90"
+# execname="mpi_ising2d_periodic_dual_lattice_probtable_relaxation"
+# execfile="${root_dir}/bin/${execname}"
+
+# srcfile="./src/ising2d_periodic_dual_lattice_probtable_int8_m.f90"
+# progfile="./app/mpi_ising2d_periodic_dual_lattice_probtable_int8_relaxation.f90"
+# execname="mpi_ising2d_periodic_dual_lattice_probtable_int8_relaxation"
+# execfile="${root_dir}/bin/${execname}"
+
+# srcfile="./src/ising2d_periodic_dual_lattice_locality_probtable_m.f90"
+# progfile="./app/mpi_ising2d_periodic_dual_lattice_locality_probtable_relaxation.f90"
+# execname="mpi_ising2d_periodic_dual_lattice_locality_probtable_relaxation"
+# execfile="${root_dir}/bin/${execname}"
+
+# srcfile="./src/ising2d_periodic_dual_lattice_locality_probtable_globalparam_m.f90"
+# progfile="./app/mpi_ising2d_periodic_dual_lattice_locality_probtable_globalparam_relaxation.f90"
+# execname="mpi_ising2d_periodic_dual_lattice_locality_probtable_globalparam_relaxation"
+# execfile="${root_dir}/bin/${execname}"
+
+# srcfile="./src/ising2d_periodic_dual_lattice_locality_probtable_globalparam_int8_m.f90"
+# progfile="./app/mpi_ising2d_periodic_dual_lattice_locality_probtable_globalparam_int8_relaxation.f90"
+# execname="mpi_ising2d_periodic_dual_lattice_locality_probtable_globalparam_int8_relaxation"
+# execfile="${root_dir}/bin/${execname}"
+
+srcfile="./src/ising2d_periodic_optim_m.f90"
+progfile="./app/mpi_ising2d_periodic_optim_relaxation.f90"
+execname="mpi_ising2d_periodic_optim_relaxation"
 execfile="${root_dir}/bin/${execname}"
 
 output_dir="data/ising2d"
